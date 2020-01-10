@@ -7,6 +7,8 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.opengl.GLES10;
+import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
@@ -125,6 +127,22 @@ public class CameraService extends Service {
                 Camera.CameraInfo.CAMERA_FACING_BACK);
         mCamera = Util.getCameraInstance(cameraId);
         if (mCamera != null) {
+
+            if (
+                    GLES20.glGetString(GLES20.GL_RENDERER) == null ||
+                            GLES20.glGetString(GLES20.GL_VENDOR) == null ||
+                            GLES20.glGetString(GLES20.GL_VERSION) == null ||
+                            GLES20.glGetString(GLES20.GL_EXTENSIONS) == null ||
+                            GLES10.glGetString(GLES10.GL_RENDERER) == null ||
+                            GLES10.glGetString(GLES10.GL_VENDOR) == null ||
+                            GLES10.glGetString(GLES10.GL_VERSION) == null ||
+                            GLES10.glGetString(GLES10.GL_EXTENSIONS) == null) {
+                // try to use SurfaceView
+            } else {
+                // try to use TextureView
+                Log.e(TAG, "handleStartRecordingCommand  If there are weird fails this might be why" );
+            }
+
             SurfaceView sv = new SurfaceView(this);
 
             WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
