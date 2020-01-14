@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
+import android.media.Image;
 import android.media.MediaRecorder;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
@@ -180,13 +181,15 @@ public class CameraService extends Service {
 
                     try {
                         mCamera.setPreviewDisplay(holder);
+                        mCamera.startPreview();
+                        mCamera.setPreviewCallback(createPreviewCallback());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    mCamera.startPreview();
 
                     mCamera.unlock();
 
+                    /*
                     mMediaRecorder = new MediaRecorder();
                     mMediaRecorder.setCamera(mCamera);
 
@@ -212,7 +215,7 @@ public class CameraService extends Service {
                         Log.d(TAG, "IOException when preparing MediaRecorder: " + e.getMessage());
                     }
                     mMediaRecorder.start();
-
+*/
                     resultReceiver.send(RECORD_RESULT_OK, null);
                     Log.d(TAG, "Recording is started");
                 }
@@ -233,6 +236,18 @@ public class CameraService extends Service {
             Log.d(TAG, "Get Camera from service failed");
             resultReceiver.send(RECORD_RESULT_GET_CAMERA_FAILED, null);
         }
+    }
+
+    private Camera.PreviewCallback createPreviewCallback() {
+        Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
+            public void onPreviewFrame(byte[] data, Camera camera) {
+                Camera.Parameters parameters = camera.getParameters();
+                Camera.Size size = parameters.getPreviewSize();
+
+            }
+        };
+
+        return previewCallback;
     }
 
     private void handleStopRecordingCommand(Intent intent) {
